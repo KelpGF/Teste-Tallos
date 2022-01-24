@@ -1,47 +1,67 @@
 <template>
-  <div>
-    <h3>
-      <router-link
-        :to="{ name: 'CreateEmployee' }"
+  <v-data-table
+    :headers="headers"
+    :items="items"
+    sort-by="name"
+    class="elevation-1"
+    :loading="isLoading"
+    hide-default-footer
+  >
+    <template v-slot:top>
+      <v-toolbar
+        flat
       >
-        <a href="#">Cadastrar Funcionário</a>
-      </router-link>
-    </h3>
-    <table>
-      <thead>
-        <th>Nome</th>
-        <th>Nível</th>
-        <th>Salário</th>
-        <th>Data de Admissão</th>
-        <th></th>
-      </thead>
-      <tbody>
-        <tr
-          :key='idx'
-          v-for='(employee, idx) in employeesList'
+        <v-toolbar-title>Funcionários</v-toolbar-title>
+        <v-divider
+          class="mx-4"
+          inset
+          vertical
+        ></v-divider>
+
+        <v-spacer></v-spacer>
+
+        <router-link
+          :to="{ name: 'CreateEmployee' }"
         >
-          <td>{{ employee.name }}</td>
-          <td>{{ employee.role }}</td>
-          <td>{{ employee.wage }}</td>
-          <td>{{ employee.admission_date }}</td>
-          <td>{{ employee.admission_date }}</td>
-          <td>
-            <button type='button' @click="findEmployee(employee._id)">
-              Ver
-            </button>
-            <router-link
-              :to="{ name: 'EditEmployee', params: { id: employee._id } }"
-              v-if="allowEditing(employee.role)"
-            >
-              <button type='button'>
-                Editar
-              </button>
-            </router-link>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+          <v-btn
+            color="primary"
+            dark
+            class="mb-2"
+          >
+            Cadastrar Funcionário
+          </v-btn>
+        </router-link>
+      </v-toolbar>
+    </template>
+    <template v-slot:[`item.role`]="{ item }">
+      {{ roleEmployee(item.role) }}
+    </template>
+    <template v-slot:[`item.name`]="{ item }">
+      {{ nameFormat(item.name) }}
+    </template>
+    <template v-slot:[`item.admission_date`]="{ item }">
+      {{ item.admission_date.split('T')[0].split('-').reverse().join('/') }}
+    </template>
+    <template v-slot:[`item.wage`]="{ item }">
+      {{ Number(item.wage).toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) }}
+    </template>
+    <template v-slot:[`item.actions`]="{ item }">
+      <v-icon
+        title="Consultar Funcionário"
+        class="mr-2 info--text"
+        @click="redirectEmployee(item._id, 'Find')"
+      >
+        mdi-eye
+      </v-icon>
+      <v-icon
+        title="Editar Funcionário"
+        class="warning--text"
+        @click="redirectEmployee(item._id, 'Edit')"
+      >
+        mdi-pencil
+      </v-icon>
+    </template>
+  </v-data-table>
 </template>
 
 <script>
@@ -50,21 +70,36 @@ import { mapState, mapActions } from 'vuex'
 export default {
   name: 'Home',
 
+  data: () => ({
+    headers: [
+      { text: 'Nome', value: 'name' },
+      { text: 'Cargo', value: 'role' },
+      { text: 'Salário', value: 'wage' },
+      { text: 'Data de Admissão', value: 'admission_date' },
+      { text: '', value: 'actions', sortable: false }
+    ],
+    isLoading: true
+  }),
+
   mounted: function () {
-    this.ActionFindEmployees()
+    this.findEmployees()
   },
 
   computed: {
     ...mapState('auth', ['user']),
-    ...mapState('home', ['employeesList'])
+    ...mapState('home', ['employeesList']),
+
+    items: function () {
+      return this.employeesList
+    }
   },
 
   methods: {
     ...mapActions('home', ['ActionFindEmployees']),
     ...mapActions('employee', ['ActionFindEmployee']),
 
-    findEmployee: async function (id) {
-      this.$router.push({ name: 'FindEmployee', params: { id } })
+    redirectEmployee: function (id, name) {
+      this.$router.push({ name: name + 'Employee', params: { id } })
     },
     allowEditing: function (employeeRole) {
       const role = this.user.role
@@ -78,6 +113,40 @@ export default {
       }
 
       return true
+    },
+    findEmployees: async function () {
+      try {
+        await this.ActionFindEmployees()
+        this.isLoading = false
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    nameFormat: function (nomeCompleto) {
+      if (nomeCompleto.length === 0) {
+        return ''
+      }
+
+      const nomeQuebrado = (nomeCompleto.trim()).split(' ')
+
+      if (nomeQuebrado.length < 3) {
+        return nomeCompleto
+      }
+
+      if (nomeQuebrado[1].length < 4) {
+        return nomeQuebrado[0] + ' ' + nomeQuebrado[1] + ' ' + nomeQuebrado[2]
+      }
+
+      return nomeQuebrado[0] + ' ' + nomeQuebrado[1]
+    },
+    roleEmployee: function (role) {
+      const roles = {
+        user: 'Usuário',
+        manager: 'Gerente',
+        admin: 'Administrador'
+      }
+
+      return roles[role]
     }
   }
 }

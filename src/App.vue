@@ -1,9 +1,13 @@
 <template>
-  <div id="app">
+  <v-app>
     <nav-bar v-if="$route.name !== 'Login'"/>
 
-    <router-view/>
-  </div>
+    <v-main>
+      <v-container fluid>
+        <router-view/>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
