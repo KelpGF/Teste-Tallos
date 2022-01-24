@@ -1,9 +1,12 @@
 <template>
-  <div class="home">
-    <h1>
-      Home |
-      <a href="#" @click='ActionSignOut()'>Sair</a>
-    </h1>
+  <div>
+    <h3>
+      <router-link
+        :to="{ name: 'CreateEmployee' }"
+      >
+        <a href="#">Cadastrar Funcionário</a>
+      </router-link>
+    </h3>
     <table>
       <thead>
         <th>Nome</th>
@@ -23,12 +26,17 @@
           <td>{{ employee.admission_date }}</td>
           <td>{{ employee.admission_date }}</td>
           <td>
-            <button
-              type='button'
-              @click='findEmployee(employee._id)'
-            >
+            <button type='button' @click="findEmployee(employee._id)">
               Ver
             </button>
+            <router-link
+              :to="{ name: 'EditEmployee', params: { id: employee._id } }"
+              v-if="allowEditing(employee.role)"
+            >
+              <button type='button'>
+                Editar
+              </button>
+            </router-link>
           </td>
         </tr>
       </tbody>
@@ -47,15 +55,29 @@ export default {
   },
 
   computed: {
+    ...mapState('auth', ['user']),
     ...mapState('home', ['employeesList'])
   },
 
   methods: {
-    ...mapActions('auth', ['ActionSignOut']),
     ...mapActions('home', ['ActionFindEmployees']),
+    ...mapActions('employee', ['ActionFindEmployee']),
 
-    findEmployee: function (id) {
-      console.log(id)
+    findEmployee: async function (id) {
+      this.$router.push({ name: 'FindEmployee', params: { id } })
+    },
+    allowEditing: function (employeeRole) {
+      const role = this.user.role
+
+      if (role === 'user') {
+        return false
+      }
+
+      if (role === 'manager' && employeeRole === 'admin') {
+        return false
+      }
+
+      return true
     }
   }
 }
