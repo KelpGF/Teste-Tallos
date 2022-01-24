@@ -52,4 +52,6 @@ export const ActionSignOut = ({ dispatch }) => {
   storage.setHeaderToken('')
   dispatch('ActionSetUser', {})
   dispatch('ActionSetToken', '')
+
+  Window._Vue.$router.push({ name: 'Login' })
 }
