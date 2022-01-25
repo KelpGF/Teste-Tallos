@@ -1,9 +1,9 @@
 <template>
-  <div>
-    <h1>Fomulário</h1>
-
-    <form-fields-employee/>
-  </div>
+  <v-container fluid fill-height>
+    <v-layout align-center justify-center>
+      <form-fields-employee/>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>

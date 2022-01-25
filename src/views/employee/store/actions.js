@@ -32,7 +32,7 @@ export const ActionClearEmployee = ({ commit }) => {
     _id: '',
     name: '',
     wage: '',
-    role: 'user',
+    role: '',
     admission_date: '',
     email: '',
     password: ''

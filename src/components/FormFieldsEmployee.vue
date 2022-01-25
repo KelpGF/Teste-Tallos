@@ -1,10 +1,16 @@
 <template>
   <v-card class="elevation-2">
+    <v-toolbar dark color="primary" v-if="!employeeId">
+      <v-toolbar-title>
+        <v-icon>mdi-account-plus</v-icon> Cadastro de Funcionário
+      </v-toolbar-title>
+    </v-toolbar>
     <v-card-title>
       Novos Dados
     </v-card-title>
     <v-card-text>
       <v-form
+        ref="form"
         class="mt-2"
         v-model="valid"
         lazy-validation
@@ -66,7 +72,9 @@
                   prepend-icon="mdi-calendar"
                   outlined
                   shaped
+                  required
                   :value="employeeAdmissionDate"
+                  :rules="[v => !!v || 'A data de admissão é obrigatória']"
                   v-on="on"
                 ></v-text-field>
               </template>
@@ -74,7 +82,6 @@
                 locale="pt-br"
                 v-model="employee.admission_date"
                 no-title
-                required
                 @input="fromDateMenu = false"
               ></v-date-picker>
             </v-menu>
@@ -99,7 +106,7 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
-              :rules="[v => !!v || 'Informe a senha']"
+              :rules="[v => !!v || 'A senha é obrigatória']"
               label="Senha"
               class="input-group--focused"
               @click:append="showPassword = !showPassword"
@@ -224,18 +231,24 @@ export default {
       'ActionClearEmployee'
     ]),
 
+    validate () {
+      return this.$refs.form.validate()
+    },
     submitForm: async function () {
       try {
-        if (this.employee._id) {
-          await this.ActionEditEmployee(this.employee)
-        } else {
-          const employeeCreate = { ...this.employee }
-          delete employeeCreate._id
+        if (this.validate()) {
+          if (this.employee._id) {
+            await this.ActionEditEmployee(this.employee)
+          } else {
+            const employeeCreate = { ...this.employee }
+            delete employeeCreate._id
 
-          await this.ActionCreateEmployee(employeeCreate)
+            await this.ActionCreateEmployee(employeeCreate)
+            this.$refs.form.reset()
+          }
+          this.showMessage = true
+          this.messageRequest = (this.employee._id) ? 'Fucionário Editado' : 'Fucionário Cadastrado'
         }
-        this.showMessage = true
-        this.messageRequest = (this.employee._id) ? 'Fucionário Editado' : 'Fucionário Cadastrado'
       } catch (error) {
         alert((error.data) ? error.data.message : error)
       }

@@ -11,7 +11,7 @@ export default {
   employeeShow: {
     name: '',
     wage: '',
-    role: 'user',
+    role: '',
     admission_date: '',
     email: ''
   }
