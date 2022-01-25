@@ -21,6 +21,7 @@
         <v-spacer></v-spacer>
 
         <router-link
+          v-if="user.role !== 'user'"
           :to="{ name: 'CreateEmployee' }"
         >
           <v-btn
@@ -54,6 +55,7 @@
         mdi-eye
       </v-icon>
       <v-icon
+        v-if="user.role !== 'user'"
         title="Editar Funcionário"
         class="warning--text"
         @click="redirectEmployee(item._id, 'Edit')"
