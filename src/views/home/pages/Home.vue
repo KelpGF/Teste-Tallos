@@ -55,7 +55,7 @@
         mdi-eye
       </v-icon>
       <v-icon
-        v-if="user.role !== 'user'"
+        v-if="allowEditing(item.role)"
         title="Editar Funcionário"
         class="warning--text"
         @click="redirectEmployee(item._id, 'Edit')"

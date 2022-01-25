@@ -106,6 +106,8 @@ export default {
     ...mapActions('auth', ['ActionLogin']),
 
     submitForm: async function () {
+      this.valid = false
+
       try {
         await this.ActionLogin(this.formLogin)
 
@@ -113,6 +115,8 @@ export default {
       } catch (error) {
         this.messageFail = error.data ? error.data.message : 'Não foi possível realizar o login!'
         this.showMessageFail = true
+      } finally {
+        this.valid = true
       }
     }
   }

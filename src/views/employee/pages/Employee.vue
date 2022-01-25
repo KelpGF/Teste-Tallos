@@ -6,11 +6,11 @@
     <p>Cargo: {{ employee.role }} </p>
     <p>Data de admissão: {{ admissionDateFormat }} </p>
     <p>Email {{ employee.email }} </p>
-    <router-link :to="{ name: 'EditEmployee', params: { id: employee._id } }">
-      <button
-        v-if="allowEditing"
-        type='button'
-      >
+    <router-link
+      v-if="allowEditing"
+      :to="{ name: 'EditEmployee', params: { id: employee._id } }"
+    >
+      <button type='button'>
         Editar
       </button>
     </router-link>
