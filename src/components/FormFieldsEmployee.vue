@@ -74,7 +74,7 @@
                   shaped
                   required
                   :value="employeeAdmissionDate"
-                  :rules="[v => !!v || 'A data de admissão é obrigatória']"
+                  :rules="dateRules"
                   v-on="on"
                 ></v-text-field>
               </template>
@@ -177,6 +177,10 @@ export default {
       v => !!v || 'O Email é obrigatório',
       v => /.+@.+\..+/.test(v) || 'Email inválido'
     ],
+    dateRules: [
+      v => !!v || 'A data de admissão é obrigatória',
+      v => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v) || 'Data de admissão inválida'
+    ],
     nameRules: [
       v => !!v || 'O Nome é obrigatório',
       v => (v && v.length >= 5) || 'O Nome deve ter pelo menos 5 letras'
@@ -247,7 +251,7 @@ export default {
             this.$refs.form.reset()
           }
           this.showMessage = true
-          this.messageRequest = (this.employee._id) ? 'Fucionário(a) Editado' : 'Fucionário(a) Cadastrado'
+          this.messageRequest = (this.employee._id) ? 'Fucionário(a) Atualizado(a)' : 'Fucionário(a) Cadastrado'
         }
       } catch (error) {
         alert((error.data) ? error.data.message : error)
