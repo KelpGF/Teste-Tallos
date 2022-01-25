@@ -22,7 +22,9 @@ export const ActionCreateEmployee = ({ dispatch }, payload) => {
 }
 
 export const ActionEditEmployee = ({ commit }, payload) => {
-  return services.employee.editEmployee({ id: payload._id }, payload)
+  return services.employee.editEmployee({ id: payload._id }, payload).then(() => {
+    commit(types.SET_EMPLOYEE, payload)
+  })
 }
 
 export const ActionClearEmployee = ({ commit }) => {

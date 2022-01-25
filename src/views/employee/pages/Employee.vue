@@ -1,42 +1,55 @@
 <template>
-  <div>
-    <h1>Detalhes do Funcionário</h1>
-    <p>Nome: {{ employee.name }} </p>
-    <p>Salário R$ {{ employee.wage }} </p>
-    <p>Cargo: {{ employee.role }} </p>
-    <p>Data de admissão: {{ admissionDateFormat }} </p>
-    <p>Email {{ employee.email }} </p>
-    <router-link
-      v-if="allowEditing"
-      :to="{ name: 'EditEmployee', params: { id: employee._id } }"
-    >
-      <button type='button'>
-        Editar
-      </button>
-    </router-link>
-    <button
-      v-if="(user.subject !== employeeId) && user.role === 'admin'"
-      type="button"
-      @click="toggleConfirmDelete(true)"
-    >
-      Deletar
-    </button>
-    <div v-if="confirmDelete">
-      Deseja realmente deletar esse funcionário?
-      <button @click="deleteEmployee()">
-        Sim
-      </button>
-      <button @click="toggleConfirmDelete(false)">
-        Não
-      </button>
-    </div>
-  </div>
+  <v-row>
+    <v-col>
+      <v-card class="elevation-2">
+        <v-card-title>
+          Detalhes do Funcionário
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col>Nome: {{ employeeShow.name }} </v-col>
+            <v-col>Salário R$ {{ employeeShow.wage }} </v-col>
+            <v-col>Cargo: {{ employeeShow.role }} </v-col>
+            <v-col>Data de admissão: {{ admissionDateFormat }} </v-col>
+            <v-col>Email {{ employeeShow.email }} </v-col>
+            <v-col>
+              <button
+                v-if="(user.subject !== employeeId) && user.role === 'admin'"
+                type="button"
+                @click="toggleConfirmDelete(true)"
+              >
+                Deletar
+              </button>
+              <div v-if="confirmDelete">
+                Deseja realmente deletar esse funcionário?
+                <button @click="deleteEmployee()">
+                  Sim
+                </button>
+                <button @click="toggleConfirmDelete(false)">
+                  Não
+                </button>
+              </div>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+      <v-divider />
+    </v-col>
+    <v-col>
+      <form-fields-employee/>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import FormFieldsEmployee from '../../../components/FormFieldsEmployee.vue'
 
 export default {
+  components: {
+    FormFieldsEmployee
+  },
+
   data: () => ({
     confirmDelete: false
   }),
@@ -47,7 +60,7 @@ export default {
 
   computed: {
     ...mapState('auth', ['user']),
-    ...mapState('employee', ['employee']),
+    ...mapState('employee', ['employeeShow']),
 
     employeeId: function () {
       return this.$route.params.id
@@ -59,14 +72,14 @@ export default {
         return false
       }
 
-      if (role === 'manager' && this.employee.role === 'admin') {
+      if (role === 'manager' && this.employeeShow.role === 'admin') {
         return false
       }
 
       return true
     },
     admissionDateFormat: function () {
-      return this.employee.admission_date.split('-').reverse().join('/')
+      return this.employeeShow.admission_date.split('-').reverse().join('/')
     }
   },
 

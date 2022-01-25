@@ -7,5 +7,12 @@ export default {
     admission_date: '',
     email: '',
     password: ''
+  },
+  employeeShow: {
+    name: '',
+    wage: '',
+    role: 'user',
+    admission_date: '',
+    email: ''
   }
 }

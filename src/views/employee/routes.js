@@ -8,10 +8,5 @@ export default [
     path: '/funcionario/:id',
     name: 'FindEmployee',
     component: () => import(/* webpackChunkName: 'FindEmployee' */ './pages/Employee')
-  },
-  {
-    path: '/editar-funcionario/:id',
-    name: 'EditEmployee',
-    component: () => import(/* webpackChunkName: 'FormEmployee' */ './pages/FormEmployee')
   }
 ]

@@ -1,26 +1,156 @@
 <template>
-  <form @submit.prevent="submitForm()">
-    <input type="text" v-model="employee.name" placeholder="Nome" required>
-    <input type="number" v-model="employee.wage" placeholder="Salário" required>
-    Cargo:
-    <select v-model="employee.role" required>
-      <option
-        :value="role.value"
-        :key="idx"
-        v-for="(role, idx) in roles"
+  <v-card class="elevation-2">
+    <v-card-title>
+      Novos Dados
+    </v-card-title>
+    <v-card-text>
+      <v-form
+        class="mt-2"
+        v-model="valid"
+        lazy-validation
+        @submit.prevent="submitForm()"
       >
-        {{ role.label }}
-      </option>
-    </select>
-    <br>
-    Data de admissão: <input type="date" v-model="employee.admission_date" required>
-    <input type="email" v-model="employee.email" placeholder="Email" required>
-    <input v-if="!employeeId" type="password" v-model="employee.password" placeholder="Senha" required>
-    <br>
-    <button>
-      Enviar
-    </button>
-  </form>
+        <v-row>
+          <v-col>
+            <v-text-field
+              prepend-icon="mdi-account-edit"
+              v-model="employee.name"
+              :rules="nameRules"
+              label="Nome"
+              required
+              outlined
+              shaped
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-text-field
+              prepend-icon="mdi-cash-multiple"
+              v-model="employee.wage"
+              :rules="[v => !!v || 'O salário é obrigatório']"
+              label="Salário"
+              type="number"
+              required
+              outlined
+              shaped
+            ></v-text-field>
+          </v-col>
+          <v-col>
+            <v-select
+              prepend-icon="mdi-account-cog"
+              v-model="employee.role"
+              :items="roles"
+              :rules="[v => !!v || 'O cargo é obrigatório']"
+              label="Cargo"
+              item-text="label"
+              item-value="value"
+              required
+              outlined
+              shaped
+            ></v-select>
+          </v-col>
+          <v-col>
+            <v-menu
+              v-model="fromDateMenu"
+              :close-on-content-click="false"
+              :nudge-right="40"
+              transition="scale-transition"
+              offset-y
+              max-width="290px"
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  label="Data de admissão"
+                  prepend-icon="mdi-calendar"
+                  outlined
+                  shaped
+                  :value="employeeAdmissionDate"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                locale="pt-br"
+                v-model="employee.admission_date"
+                no-title
+                required
+                @input="fromDateMenu = false"
+              ></v-date-picker>
+            </v-menu>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-text-field
+              prepend-icon="mdi-email"
+              v-model="employee.email"
+              :rules="emailRules"
+              label="Email"
+              required
+              outlined
+              shaped
+            ></v-text-field>
+          </v-col>
+          <v-col
+            v-if="!employeeId"
+          >
+            <v-text-field
+              prepend-icon="mdi-lock"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showPassword ? 'text' : 'password'"
+              :rules="[v => !!v || 'Informe a senha']"
+              label="Senha"
+              class="input-group--focused"
+              @click:append="showPassword = !showPassword"
+              v-model='employee.password'
+              outlined
+              shaped
+              required
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-spacer></v-spacer>
+          <v-btn
+            type="submit"
+            :disabled="!valid"
+            color="success"
+            class="mb-4 mt-0 mr-5"
+          >
+            <v-icon class="mr-1">
+              mdi-account-check
+            </v-icon>
+            Salvar
+          </v-btn>
+          <v-snackbar
+            v-model="showMessage"
+            :timeout="3000"
+            color="primary"
+            absolute
+            shaped
+            left
+            class="mb-4 mt-0 ml-5"
+          >
+            <span class="font-weight-bold text-4">
+              {{ messageRequest }}
+            </span>
+            <template v-slot:action="{ attrs }">
+              <v-btn
+                text
+                v-bind="attrs"
+                @click="showMessage = false"
+              >
+                <v-icon>
+                  mdi-close
+                </v-icon>
+              </v-btn>
+            </template>
+          </v-snackbar>
+        </v-row>
+      </v-form>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
@@ -30,10 +160,24 @@ import { mapState, mapActions } from 'vuex'
 export default {
   name: 'FormFieldsEmployee',
 
+  data: () => ({
+    showPassword: false,
+    showMessage: false,
+    messageRequest: '',
+    fromDateMenu: false,
+    valid: true,
+    emailRules: [
+      v => !!v || 'O Email é obrigatório',
+      v => /.+@.+\..+/.test(v) || 'Email inválido'
+    ],
+    nameRules: [
+      v => !!v || 'O Nome é obrigatório',
+      v => (v && v.length >= 5) || 'O Nome deve ter pelo menos 5 letras'
+    ]
+  }),
+
   created: function () {
-    if (this.employeeId) {
-      this.findEmployee()
-    } else {
+    if (!this.employeeId) {
       this.ActionClearEmployee()
     }
   },
@@ -68,41 +212,18 @@ export default {
 
       return roles
     },
-    allowEditing: function () {
-      const role = this.user.role
-
-      if (role === 'user') {
-        return false
-      }
-
-      if (role === 'manager' && this.employee.role === 'admin') {
-        return false
-      }
-
-      return true
+    employeeAdmissionDate: function () {
+      return this.employee.admission_date.split('-').reverse().join('/')
     }
   },
 
   methods: {
     ...mapActions('employee', [
-      'ActionFindEmployee',
       'ActionCreateEmployee',
       'ActionEditEmployee',
       'ActionClearEmployee'
     ]),
 
-    findEmployee: async function () {
-      try {
-        await this.ActionFindEmployee(this.employeeId)
-
-        if (!this.allowEditing) {
-          this.$router.push({ name: 'Home' })
-        }
-      } catch (error) {
-        alert((error.data) ? error.data.message : error)
-        this.$router.push({ name: 'Home' })
-      }
-    },
     submitForm: async function () {
       try {
         if (this.employee._id) {
@@ -113,7 +234,8 @@ export default {
 
           await this.ActionCreateEmployee(employeeCreate)
         }
-        alert('Sucesso')
+        this.showMessage = true
+        this.messageRequest = (this.employee._id) ? 'Fucionário Editado' : 'Fucionário Cadastrado'
       } catch (error) {
         alert((error.data) ? error.data.message : error)
       }

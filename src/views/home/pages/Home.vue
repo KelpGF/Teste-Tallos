@@ -5,13 +5,16 @@
     sort-by="name"
     class="elevation-1"
     :loading="isLoading"
+    loading-text="Carregando..."
     hide-default-footer
   >
     <template v-slot:top>
       <v-toolbar
         flat
       >
-        <v-toolbar-title>Funcionários</v-toolbar-title>
+        <v-toolbar-title class="info--text">
+          Funcionários
+        </v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
@@ -29,10 +32,24 @@
             dark
             class="mb-2"
           >
+            <v-icon class="mr-2">
+              mdi-account-plus
+            </v-icon>
             Cadastrar Funcionário
           </v-btn>
         </router-link>
       </v-toolbar>
+    </template>
+    <template v-slot:no-data>
+      <v-alert
+        class="mt-2"
+        border="top"
+        colored-border
+        type="info"
+        elevation="2"
+      >
+        Nenhum funcionário encontrado
+      </v-alert>
     </template>
     <template v-slot:[`item.role`]="{ item }">
       {{ roleEmployee(item.role) }}
@@ -48,19 +65,11 @@
     </template>
     <template v-slot:[`item.actions`]="{ item }">
       <v-icon
-        title="Consultar Funcionário"
+        title="Detalhes do Funcionário"
         class="mr-2 info--text"
-        @click="redirectEmployee(item._id, 'Find')"
+        @click="redirectEmployee(item._id)"
       >
-        mdi-eye
-      </v-icon>
-      <v-icon
-        v-if="allowEditing(item.role)"
-        title="Editar Funcionário"
-        class="warning--text"
-        @click="redirectEmployee(item._id, 'Edit')"
-      >
-        mdi-pencil
+        mdi-account-eye
       </v-icon>
     </template>
   </v-data-table>
@@ -100,21 +109,8 @@ export default {
     ...mapActions('home', ['ActionFindEmployees']),
     ...mapActions('employee', ['ActionFindEmployee']),
 
-    redirectEmployee: function (id, name) {
-      this.$router.push({ name: name + 'Employee', params: { id } })
-    },
-    allowEditing: function (employeeRole) {
-      const role = this.user.role
-
-      if (role === 'user') {
-        return false
-      }
-
-      if (role === 'manager' && employeeRole === 'admin') {
-        return false
-      }
-
-      return true
+    redirectEmployee: function (id) {
+      this.$router.push({ name: 'FindEmployee', params: { id } })
     },
     findEmployees: async function () {
       try {

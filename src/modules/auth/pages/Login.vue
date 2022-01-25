@@ -23,6 +23,7 @@
                     :rules="emailRules"
                     outlined
                     shaped
+                    required
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -39,6 +40,7 @@
                     v-model='formLogin.password'
                     outlined
                     shaped
+                    required
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -58,10 +60,10 @@
               <v-row>
                 <v-spacer></v-spacer>
                 <v-btn
+                  type="submit"
                   :disabled="!valid"
                   color="primary"
                   class="mb-4 mt-0 mr-5"
-                  @click="submitForm()"
                 >
                   <v-icon>mdi-login</v-icon> Entrar
                 </v-btn>
