@@ -234,6 +234,7 @@ export default {
       'ActionEditEmployee',
       'ActionClearEmployee'
     ]),
+    ...mapActions('auth', ['ActionSetUser']),
 
     validate () {
       return this.$refs.form.validate()
@@ -243,6 +244,17 @@ export default {
         if (this.validate()) {
           if (this.employee._id) {
             await this.ActionEditEmployee(this.employee)
+
+            if (this.employee._id === this.user.subject) {
+              this.ActionSetUser({
+                subject: this.employee._id,
+                name: this.employee.name,
+                email: this.employee.email,
+                exp: this.user.exp,
+                iat: this.user.iat,
+                role: this.employee.role
+              })
+            }
           } else {
             const employeeCreate = { ...this.employee }
             delete employeeCreate._id

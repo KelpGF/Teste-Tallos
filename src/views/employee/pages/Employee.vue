@@ -163,7 +163,7 @@ export default {
 
         this.isLoading = false
       } catch (error) {
-        alert((error.data) ? error.data.message : error)
+        console.log((error.data) ? error.data.message : error)
         this.$router.push({ name: 'Home' })
       }
     },
@@ -173,17 +173,18 @@ export default {
     deleteEmployee: async function () {
       if (this.confirmDelete) {
         try {
-          await this.ActionDeleteEmployee(this.employeeId)
-
+          // await this.ActionDeleteEmployee(this.employeeId)
+          // this.$refs.form.reset()
+          console.log(this.$refs)
           this.confirmDelete = false
           this.showMessage = true
           this.messageRequest = 'Funcionário(a) Deletado(a)'
 
           setTimeout(() => {
-            this.$router.push({ name: 'Home' })
+            // this.$router.push({ name: 'Home' })
           }, 2000)
         } catch (error) {
-          alert((error.data) ? error.data.message : error)
+          console.log((error.data) ? error.data.message : error)
         }
       }
     }
