@@ -17,32 +17,84 @@
     <v-col>
       <v-card class="elevation-2">
         <v-card-title>
-          Detalhes do Funcionário
+          Detalhes do Funcionário(a)
         </v-card-title>
         <v-card-text>
           <v-row>
-            <v-col>Nome: {{ employeeShow.name }} </v-col>
-            <v-col>Salário {{ Number(employeeShow.wage).toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) }} </v-col>
-            <v-col>Cargo: {{ roles[employeeShow.role] }} </v-col>
-            <v-col>Data de admissão: {{ employeeShow.admission_date.split('-').reverse().join('/') }} </v-col>
-            <v-col>Email {{ employeeShow.email }} </v-col>
             <v-col>
-              <button
+              <span class="text-h6 font-weight-medium">
+                <v-icon>mdi-account-tie-outline</v-icon>
+                {{ roles[employeeShow.role] }}: {{ employeeShow.name }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <span class="text-subtitle-1 font-weight-medium">
+                <v-icon>mdi-email</v-icon>
+                Endereço eletrônico: {{ employeeShow.email }}
+              </span>
+            </v-col>
+          </v-row>
+          <v-row>
+              <v-col>
+                <span class="text-subtitle-2 font-weight-medium">
+                  <v-icon>mdi-file-account</v-icon>
+                  Admitido em {{ employeeShow.admission_date.split('-').reverse().join('/') }}.
+                  Atualmente possui o salário de
+                  {{ Number(employeeShow.wage).toLocaleString('pt-br', {style: 'currency', currency: 'BRL'}) }}
+                </span>
+              </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-dialog v-model="confirmDelete" max-width="500px">
+                <v-card color="primary">
+                  <v-card-title class="text-h6 white--text">
+                    Deseja realmente deletar o(a) funcionário(a)
+                    <strong>{{ employeeShow.name }}</strong>?
+                  </v-card-title>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="white darken-1"
+                      text
+                      @click="toggleConfirmDelete(false)"
+                    >
+                      Não
+                    </v-btn>
+                    <v-btn
+                      color="red darken-1"
+                      @click="deleteEmployee()"
+                      class="white--text"
+                    >
+                      Sim
+                    </v-btn>
+                    <v-spacer></v-spacer>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+              <v-btn
                 v-if="(user.subject !== employeeId) && user.role === 'admin'"
-                type="button"
                 @click="toggleConfirmDelete(true)"
+                color="red"
+                class="mb-4 mt-0 mr-5 white--text"
               >
-                Deletar
-              </button>
-              <div v-if="confirmDelete">
-                Deseja realmente deletar esse funcionário?
-                <button @click="deleteEmployee()">
-                  Sim
-                </button>
-                <button @click="toggleConfirmDelete(false)">
-                  Não
-                </button>
-              </div>
+                <v-icon>mdi-delete</v-icon> Deletar
+              </v-btn>
+              <v-snackbar
+                v-model="showMessage"
+                :timeout="2000"
+                color="red"
+                absolute
+                right
+                elevation="24"
+                class="mb-4 mt-0 ml-5"
+              >
+                <span class="font-weight-bold text-4">
+                  {{ messageRequest }}
+                </span>
+              </v-snackbar>
             </v-col>
           </v-row>
         </v-card-text>
@@ -50,7 +102,7 @@
       <v-divider />
     </v-col>
     <v-col>
-      <form-fields-employee/>
+      <form-fields-employee v-if="allowEditing"/>
     </v-col>
   </v-row>
 </template>
@@ -66,6 +118,8 @@ export default {
 
   data: () => ({
     confirmDelete: false,
+    showMessage: false,
+    messageRequest: '',
     roles: {
       user: 'Usuário',
       manager: 'Gerente',
@@ -121,8 +175,13 @@ export default {
         try {
           await this.ActionDeleteEmployee(this.employeeId)
 
-          alert('Funcionário deletado!')
-          this.$router.push({ name: 'Home' })
+          this.confirmDelete = false
+          this.showMessage = true
+          this.messageRequest = 'Funcionário(a) Deletado(a)'
+
+          setTimeout(() => {
+            this.$router.push({ name: 'Home' })
+          }, 2000)
         } catch (error) {
           alert((error.data) ? error.data.message : error)
         }

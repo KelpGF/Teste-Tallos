@@ -5,8 +5,8 @@
         <v-icon>mdi-account-plus</v-icon> Cadastro de Funcionário
       </v-toolbar-title>
     </v-toolbar>
-    <v-card-title>
-      Novos Dados
+    <v-card-title v-if="employeeId">
+      Atualizar Dados
     </v-card-title>
     <v-card-text>
       <v-form
@@ -247,7 +247,7 @@ export default {
             this.$refs.form.reset()
           }
           this.showMessage = true
-          this.messageRequest = (this.employee._id) ? 'Fucionário Editado' : 'Fucionário Cadastrado'
+          this.messageRequest = (this.employee._id) ? 'Fucionário(a) Editado' : 'Fucionário(a) Cadastrado'
         }
       } catch (error) {
         alert((error.data) ? error.data.message : error)
