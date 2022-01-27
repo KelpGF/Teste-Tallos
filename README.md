@@ -23,3 +23,9 @@ docker-compose up --build
 ```
 docker cp teste-tallos:/srv/app/node_modules/. ./node_modules)
 ```
+
+## Observações sobre o sistema
+  - O Administrador possuí acesso a todas as funcionalidades
+  - O Gerente possuí acesso a todas as funcionalidades, exeto a de deletar outros funcionários
+  - O Gerente não pode cadastrar um Administrador, nem editar o cargo de um funcionário para Administrador
+  - O Usuário tem acesso somente a leitura dos dados

@@ -10,9 +10,7 @@ export const ActionFindEmployee = ({ commit }, payload) => {
 }
 
 export const ActionDeleteEmployee = ({ dispatch }, payload) => {
-  return services.employee.deleteEmployee({ id: payload }).then(() => {
-    dispatch('ActionClearEmployee')
-  })
+  return services.employee.deleteEmployee({ id: payload })
 }
 
 export const ActionCreateEmployee = ({ dispatch }, payload) => {

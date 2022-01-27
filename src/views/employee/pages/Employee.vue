@@ -1,6 +1,6 @@
 <template>
   <v-row>
-    <transition name="fade">
+    <v-fade-transition>
       <div
         class="box-pre-loader"
         v-if="isLoading"
@@ -13,7 +13,7 @@
             style="margin-top: 15%;"
           ></v-progress-circular>
       </div>
-    </transition>
+    </v-fade-transition>
     <v-col>
       <v-card class="elevation-2">
         <v-card-title>
@@ -155,7 +155,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('employee', ['ActionFindEmployee', 'ActionDeleteEmployee']),
+    ...mapActions('employee', ['ActionFindEmployee', 'ActionDeleteEmployee', 'ActionClearEmployee']),
 
     findEmployee: async function () {
       try {
@@ -173,15 +173,15 @@ export default {
     deleteEmployee: async function () {
       if (this.confirmDelete) {
         try {
-          // await this.ActionDeleteEmployee(this.employeeId)
-          // this.$refs.form.reset()
-          console.log(this.$refs)
+          await this.ActionDeleteEmployee(this.employeeId)
+
           this.confirmDelete = false
           this.showMessage = true
           this.messageRequest = 'Funcionário(a) Deletado(a)'
 
           setTimeout(() => {
-            // this.$router.push({ name: 'Home' })
+            this.ActionClearEmployee()
+            this.$router.push({ name: 'Home' })
           }, 2000)
         } catch (error) {
           console.log((error.data) ? error.data.message : error)
@@ -201,12 +201,5 @@ export default {
     background-color: #1976d2;
     text-align: center;
     align-content: center;
-  }
-
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active em versões anteriores a 2.1.8 */ {
-    opacity: 0;
   }
 </style>

@@ -34,7 +34,7 @@
             <v-text-field
               prepend-icon="mdi-cash-multiple"
               v-model="employee.wage"
-              :rules="[v => !!v || 'O salário é obrigatório']"
+              :rules="[v => !!v || 'Obrigatório']"
               label="Salário"
               type="number"
               required
@@ -47,7 +47,7 @@
               prepend-icon="mdi-account-cog"
               v-model="employee.role"
               :items="roles"
-              :rules="[v => !!v || 'O cargo é obrigatório']"
+              :rules="[v => !!v || 'Obrigatório']"
               label="Cargo"
               item-text="label"
               item-value="value"
@@ -88,7 +88,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col>
+          <v-col cols="7">
             <v-text-field
               prepend-icon="mdi-email"
               v-model="employee.email"
@@ -106,7 +106,7 @@
               prepend-icon="mdi-lock"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
-              :rules="[v => !!v || 'A senha é obrigatória']"
+              :rules="passwordRules"
               label="Senha"
               class="input-group--focused"
               @click:append="showPassword = !showPassword"
@@ -117,6 +117,24 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        <v-scroll-y-transition>
+          <v-row v-if="showMessageFail">
+            <v-col
+              :key="idx"
+              v-for="(message, idx) in errorMessages"
+            >
+              <v-alert
+                outlined
+                text
+                dense
+                type="error"
+                icon="mdi-cloud-alert"
+              >
+                {{ message }}
+              </v-alert>
+            </v-col>
+          </v-row>
+        </v-scroll-y-transition>
         <v-row>
           <v-spacer></v-spacer>
           <v-btn
@@ -174,22 +192,37 @@ export default {
     fromDateMenu: false,
     valid: true,
     emailRules: [
-      v => !!v || 'O Email é obrigatório',
+      v => !!v || 'Obrigatório',
       v => /.+@.+\..+/.test(v) || 'Email inválido'
     ],
     dateRules: [
-      v => !!v || 'A data de admissão é obrigatória',
+      v => !!v || 'Obrigatório',
       v => /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(v) || 'Data de admissão inválida'
     ],
     nameRules: [
-      v => !!v || 'O Nome é obrigatório',
+      v => !!v || 'Obrigatório',
       v => (v && v.length >= 5) || 'O Nome deve ter pelo menos 5 letras'
-    ]
+    ],
+    passwordRules: [
+      v => !!v || 'Obrigatório',
+      v => (v && v.length >= 3) || 'A senha deve ter pelo menos 3 caracteres'
+    ],
+    errorMessages: [],
+    showMessageFail: true
   }),
 
   created: function () {
     if (!this.employeeId) {
       this.ActionClearEmployee()
+    }
+  },
+
+  watch: {
+    employee: {
+      deep: true,
+      handler: function () {
+        this.showMessageFail = false
+      }
     }
   },
 
@@ -242,6 +275,8 @@ export default {
     submitForm: async function () {
       try {
         if (this.validate()) {
+          this.$set(this.employee, 'wage', Number(this.employee.wage))
+
           if (this.employee._id) {
             await this.ActionEditEmployee(this.employee)
 
@@ -263,10 +298,18 @@ export default {
             this.$refs.form.reset()
           }
           this.showMessage = true
-          this.messageRequest = (this.employee._id) ? 'Fucionário(a) Atualizado(a)' : 'Fucionário(a) Cadastrado'
+          this.messageRequest = (this.employee._id) ? 'Funcionário(a) Atualizado(a)' : 'Funcionário(a) Cadastrado'
         }
       } catch (error) {
-        alert((error.data) ? error.data.message : error)
+        const messages = (error.data) ? error.data.message : error
+
+        if (Array.isArray(messages)) {
+          this.errorMessages = messages
+        } else {
+          this.errorMessages = [messages]
+        }
+
+        this.showMessageFail = true
       }
     }
   }
