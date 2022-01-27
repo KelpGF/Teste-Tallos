@@ -77,6 +77,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import io from 'socket.io-client'
 
 export default {
   name: 'Home',
@@ -89,8 +90,17 @@ export default {
       { text: 'Data de Admissão', value: 'admission_date' },
       { text: '', value: 'actions', sortable: false }
     ],
-    isLoading: true
+    isLoading: true,
+    socket: io('localhost:3000')
   }),
+
+  created: function () {
+    this.socket.on('connect', () => {
+      this.socket.on('UPDATE_EMPLOYEE_LIST', () => {
+        this.findEmployees()
+      })
+    })
+  },
 
   mounted: function () {
     this.findEmployees()

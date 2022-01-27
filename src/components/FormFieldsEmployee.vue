@@ -180,6 +180,7 @@
 
 <script>
 
+import io from 'socket.io-client'
 import { mapState, mapActions } from 'vuex'
 
 export default {
@@ -208,7 +209,8 @@ export default {
       v => (v && v.length >= 3) || 'A senha deve ter pelo menos 3 caracteres'
     ],
     errorMessages: [],
-    showMessageFail: true
+    showMessageFail: true,
+    socket: io('localhost:3000')
   }),
 
   created: function () {
@@ -227,7 +229,7 @@ export default {
   },
 
   computed: {
-    ...mapState('employee', ['employee']),
+    ...mapState('employee', ['employee', 'employeeShow']),
     ...mapState('auth', ['user']),
 
     employeeId: function () {
@@ -278,6 +280,7 @@ export default {
           this.$set(this.employee, 'wage', Number(this.employee.wage))
 
           if (this.employee._id) {
+            const role = this.employeeShow.role
             await this.ActionEditEmployee(this.employee)
 
             if (this.employee._id === this.user.subject) {
@@ -290,12 +293,17 @@ export default {
                 role: this.employee.role
               })
             }
+            if (this.employee.role !== role) {
+              console.log('cargo editado')
+              this.socket.emit('EDIT_EMPLOYEE')
+            }
           } else {
             const employeeCreate = { ...this.employee }
             delete employeeCreate._id
 
             await this.ActionCreateEmployee(employeeCreate)
             this.$refs.form.reset()
+            this.socket.emit('CREATE_DELETE_EMPLOYEE')
           }
           this.showMessage = true
           this.messageRequest = (this.employee._id) ? 'Funcionário(a) Atualizado(a)' : 'Funcionário(a) Cadastrado'

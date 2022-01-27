@@ -9,6 +9,7 @@ Este é um projeto para controle de funcionários usando VueJS, Vuex e Vuetify, 
   - [Vuetify](https://vuetifyjs.com/)
   - [NPM](https://www.npmjs.com)
   - [Docker](https://www.docker.com)
+  - [Socket.IO](https://socket.io/)
 
 
 ### Instalando as dependências e rodando o projeto:

@@ -84,7 +84,7 @@ export default {
     valid: true,
     showPassword: false,
     formLogin: {
-      email: 'k@g.c',
+      email: 'adm@email.com',
       password: '123'
     },
     emailRules: [

@@ -110,6 +110,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import FormFieldsEmployee from '../../../components/FormFieldsEmployee.vue'
+import io from 'socket.io-client'
 
 export default {
   components: {
@@ -125,7 +126,8 @@ export default {
       manager: 'Gerente',
       admin: 'Administrador'
     },
-    isLoading: true
+    isLoading: true,
+    socket: io('localhost:3000')
   }),
 
   mounted: function () {
@@ -178,6 +180,8 @@ export default {
           this.confirmDelete = false
           this.showMessage = true
           this.messageRequest = 'Funcionário(a) Deletado(a)'
+
+          this.socket.emit('CREATE_DELETE_EMPLOYEE')
 
           setTimeout(() => {
             this.ActionClearEmployee()

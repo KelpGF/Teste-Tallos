@@ -12,10 +12,28 @@
 
 <script>
 import NavBar from './components/layout/NavBar'
+import io from 'socket.io-client'
+import { mapActions } from 'vuex'
 
 export default {
+  data: () => ({
+    socket: io('localhost:3000')
+  }),
+
   components: {
     NavBar
+  },
+
+  created: function () {
+    this.socket.on('connect', () => {
+      this.socket.on('UPDATE_CURRENT_USER', () => {
+        this.ActionLoadSession()
+      })
+    })
+  },
+
+  methods: {
+    ...mapActions('auth', ['ActionLoadSession'])
   }
 }
 </script>
