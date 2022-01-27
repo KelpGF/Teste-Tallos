@@ -294,7 +294,6 @@ export default {
               })
             }
             if (this.employee.role !== role) {
-              console.log('cargo editado')
               this.socket.emit('EDIT_EMPLOYEE')
             }
           } else {
@@ -303,7 +302,7 @@ export default {
 
             await this.ActionCreateEmployee(employeeCreate)
             this.$refs.form.reset()
-            this.socket.emit('CREATE_DELETE_EMPLOYEE')
+            this.socket.emit('CREATE_DELETE_EMPLOYEE', { type: 'create' })
           }
           this.showMessage = true
           this.messageRequest = (this.employee._id) ? 'Funcionário(a) Atualizado(a)' : 'Funcionário(a) Cadastrado'

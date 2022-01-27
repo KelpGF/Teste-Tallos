@@ -181,7 +181,7 @@ export default {
           this.showMessage = true
           this.messageRequest = 'Funcionário(a) Deletado(a)'
 
-          this.socket.emit('CREATE_DELETE_EMPLOYEE')
+          this.socket.emit('CREATE_DELETE_EMPLOYEE', { type: 'delete' })
 
           setTimeout(() => {
             this.ActionClearEmployee()

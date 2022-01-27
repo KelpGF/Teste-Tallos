@@ -29,6 +29,11 @@ export default {
       this.socket.on('UPDATE_CURRENT_USER', () => {
         this.ActionLoadSession()
       })
+      this.socket.on('UPDATE_EMPLOYEE_LIST', (data) => {
+        if (data.type === 'delete') {
+          this.ActionLoadSession()
+        }
+      })
     })
   },
 
